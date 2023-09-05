@@ -1,0 +1,25 @@
+version: '3'
+services:
+  tomcat:
+    image: tomcat:latest
+    ports:
+      - 8080:8080
+    volumes:
+      - ./project-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/website.war
+      - ./CRUD-Panel-1.0-SNAPSHOT.war:/usr/local/tomcat/webapps/admin.war
+      - ./jre_files/java-json.jar:/usr/local/tomcat/lib/java-json.jar
+      - ./jre_files/jakarta.activation-2.0.1.jar:/usr/local/tomcat/lib/jakarta.activation-2.0.1.jar
+      - ./jre_files/jakarta.mail-2.0.1.jar:/usr/local/tomcat/lib/jakarta.mail-2.0.1.jar
+      - ./jre_files/mysql-connector-java-5.1.38-bin.jar:/usr/local/tomcat/lib/mysql-connector-java-5.1.38-bin.jar
+    depends_on:
+      - mariadb
+  mariadb:
+    image: mariadb:10.4.27
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=testmdb
+      - MYSQL_INITDB_SKIP_TZINFO=true
+    ports:
+      - 3307:3306
+    volumes:
+      - ./testmdb.sql:/docker-entrypoint-initdb.d/testmdb.sql

@@ -1,0 +1,7 @@
+{
+    email my-email@sample.com
+}
+
+sample-dns-record {
+    reverse_proxy x.x.x.x:0000
+}

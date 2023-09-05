@@ -1,0 +1,14 @@
+FROM tomcat:latest
+COPY project-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/
+
+COPY jakarta.activation-2.0.1.jar /usr/local/tomcat/lib/
+COPY jakarta.mail-2.0.1.jar /usr/local/tomcat/lib/
+COPY java-json.jar /usr/local/tomcat/lib/
+COPY mysql-connector-java-5.1.38-bin.jar /usr/local/tomcat/lib/
+
+FROM mariadb:10.4.27
+ENV MYSQL_ALLOW_EMPTY_PASSWORD=true \
+	MYSQL_DATABASE=testmdb \
+	MYSQL_INITDB_SKIP_TZINFO=true
+
+COPY testmdb.sql /docker-entrypoint-initdb.d/
