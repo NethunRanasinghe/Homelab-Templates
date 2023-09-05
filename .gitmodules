@@ -1,0 +1,3 @@
+[submodule "MyAnsibleLibrary"]
+	path = MyAnsibleLibrary
+	url = git@github.com:NethunRanasinghe/MyAnsibleLibrary.git
