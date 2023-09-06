@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  semaphore:
+    container_name: semaphore_dashboard
+    ports:
+      - 4000:3000 # 3000 conflicted with grafana
+    image: semaphoreui/semaphore:latest
+    user: "${UID}:${GID}"
+    env_file:
+      - env
+    volumes:
+      - ./inventory/:/inventory:ro
+      - ./authorized-keys/:/authorized-keys:ro
+      - ./config/:/etc/semaphore:rw
+    restart: unless-stopped
