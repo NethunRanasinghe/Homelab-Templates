@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: <NAME>-cron-ecr
+  namespace: <NAMESPACE>
+spec:
+  schedule: "0 */10 * * *" # Replace with your desired schedule
+  successfulJobsHistoryLimit: 2
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: <NAMESPACE>-sa-ecr # Replace with your service account name if different
+          containers:
+          - name: <NAMESPACE> 
+            image: nethun/awsktcl:v1
+            imagePullPolicy: IfNotPresent
+            envFrom:
+              - secretRef:
+                  name: <NAMESPACE>-secrets-ecr # Replace with your secret name if different
+              - configMapRef:
+                  name: <NAMESPACE>-cm-ecr # Replace with your configmap name if different
+            command:
+              - /bin/bash
+              - -c
+              - |-
+                ECR_TOKEN="$(aws ecr get-login-password --region ${AWS_REGION})"
+                NAMESPACE_NAME=<NAMESPACE> # Replace with your desired namespace
+                kubectl delete secret --ignore-not-found $DOCKER_SECRET_NAME -n $NAMESPACE_NAME
+                kubectl create secret docker-registry $DOCKER_SECRET_NAME --docker-server=https://${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com --docker-username=AWS --docker-password=${ECR_TOKEN} --namespace=$NAMESPACE_NAME
+                echo "Secret was successfully updated at $(date)"
+          restartPolicy: Never

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-pvc-grafana
+  labels:
+    app: grafana
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "freenas-iscsi-csi"
+spec:
+  storageClassName: freenas-iscsi-csi
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,82 @@
+csiDriver:
+  name: "org.democratic-csi.iscsi"
+
+storageClasses:
+- name: freenas-iscsi-csi
+  defaultClass: false
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+  allowVolumeExpansion: true
+  parameters:
+    fsType: ext4
+
+  mountOptions: []
+  secrets:
+    provisioner-secret:
+    controller-publish-secret:
+    node-stage-secret:
+    node-publish-secret:
+    controller-expand-secret:
+
+driver:
+  config:
+    driver: freenas-iscsi
+    instance_id:
+    httpConnection:
+      protocol: http
+      host: <TRUENAS_HOST_IP>
+      port: 80
+      apiKey: <API_KEY>
+      username: <TRUENAS_USERNAME>
+      allowInsecure: true
+      apiVersion: 2
+    sshConnection:
+      host: <TRUENAS_HOST_IP>
+      port: 22
+      username: <TRUENAS_USERNAME>
+      privateKey: |
+        -----BEGIN OPENSSH PRIVATE KEY-----
+        <KEY>
+        -----END OPENSSH PRIVATE KEY-----
+    zfs:
+      cli:
+       paths:
+         zfs: /usr/sbin/zfs
+         zpool: /usr/sbin/zpool
+         sudo: /usr/bin/sudo
+         chroot: /usr/sbin/chroot
+
+      datasetParentName: Kubernetes-Pool/k8s/iscsi/vols # Change
+      detachedSnapshotsDatasetParentName: Kubernetes-Pool/k8s/iscsi/snaps # Change
+      zvolCompression:
+      zvolDedup:
+      zvolEnableReservation: false
+      zvolBlocksize:
+    iscsi:
+      targetPortal: "<TRUENAS_HOST_IP>:3260"
+      targetPortals: []
+      interface:
+      namePrefix: csi-
+      nameSuffix: "-cluster"
+      targetGroups:
+        - targetGroupPortalGroup: 2 # Change
+          targetGroupInitiatorGroup: 3 # Change
+          targetGroupAuthType: None
+          targetGroupAuthGroup:
+      extentInsecureTpc: true
+      extentXenCompat: false
+      extentDisablePhysicalBlocksize: true
+      extentBlocksize: 4096
+      extentRpm: "7200"
+      extentAvailThreshold: 0
+
+node:
+  hostPID: true
+  driver:
+    extraEnv:
+      - name: ISCSIADM_HOST_STRATEGY
+        value: nsenter
+      - name: ISCSIADM_HOST_PATH
+        value: /usr/local/sbin/iscsiadm
+    iscsiDirHostPath: /usr/local/etc/iscsi
+    iscsiDirHostPathType: ""

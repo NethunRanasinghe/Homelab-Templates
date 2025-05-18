@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: <NAME>-secrets-ecr
+  namespace: <NAMESPACE>
+stringData:
+  AWS_SECRET_ACCESS_KEY: "" # Replace with your AWS secret access key
+  AWS_ACCESS_KEY_ID: "" # Replace with your AWS access key ID
+  AWS_ACCOUNT: "" # Replace with your AWS account ID
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: <NAME>-cm-ecr
+  namespace: <NAMESPACE>
+data:
+  AWS_REGION: "" # Replace with your ECR region
+  DOCKER_SECRET_NAME: regcred # Replace with your desired ECR token secret name
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: <NAME>-sa-ecr
+  namespace: <NAMESPACE>

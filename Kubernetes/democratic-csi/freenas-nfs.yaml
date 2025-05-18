@@ -1,0 +1,73 @@
+csiDriver:
+  name: "org.democratic-csi.nfs"
+
+storageClasses:
+- name: freenas-nfs-csi
+  defaultClass: false
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+  allowVolumeExpansion: true
+  parameters:
+    fsType: nfs
+
+  mountOptions:
+  - noatime
+  - nfsvers=4
+  secrets:
+    provisioner-secret:
+    controller-publish-secret:
+    node-stage-secret:
+    node-publish-secret:
+    controller-expand-secret:
+
+controller:
+  driver:
+    enabled: true
+    image:
+      registry: docker.io/democraticcsi/democratic-csi # Temp
+      tag: next
+
+driver:
+  config:
+    driver: freenas-nfs
+    instance_id:
+    httpConnection:
+      protocol: http
+      host: <TRUENAS_HOST_IP>
+      port: 80
+      apiKey: <API_KEY>
+      username: <TRUENAS_USERNAME>
+      allowInsecure: true
+      apiVersion: 2
+    sshConnection:
+      host: <TRUENAS_HOST_IP>
+      port: 22
+      username: <TRUENAS_USERNAME>
+      privateKey: |
+        -----BEGIN OPENSSH PRIVATE KEY-----
+        <KEY>
+        -----END OPENSSH PRIVATE KEY-----
+    zfs:
+      cli:
+       paths:
+         zfs: /usr/sbin/zfs
+         zpool: /usr/sbin/zpool
+         sudo: /usr/bin/sudo
+         chroot: /usr/sbin/chroot
+
+      datasetParentName: Kubernetes-Pool/k8s/nfs/vols # Change
+      detachedSnapshotsDatasetParentName: Kubernetes-Pool/k8s/nfs/snaps # Change
+      datasetEnableQuotas: true
+      datasetEnableReservation: false
+      datasetPermissionsMode: "0777"
+      datasetPermissionsUser: 0
+      datasetPermissionsGroup: 0
+    nfs:
+      shareHost: <TRUENAS_HOST_IP>
+      shareAlldirs: false
+      shareAllowedHosts: []
+      shareAllowedNetworks: []
+      shareMaprootUser: <TRUENAS_USERNAME>
+      shareMaprootGroup: wheel # Change
+      shareMapallUser: ""
+      shareMapallGroup: ""
